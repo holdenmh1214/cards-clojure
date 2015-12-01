@@ -23,8 +23,27 @@
 (defn flush? [hand]
   (= 1 (count (set (map :suit hand)))))
 
+(defn four-of-a-kind? [hand]
+  (== (apply max (vals (frequencies (map :rank hand)))) 4))
+
+(defn three-of-a-kind? [hand]
+  (== (apply max (vals (frequencies (map :rank hand)))) 3))
+
+(defn straight? [hand]                                      ;does not work for face cards....
+  (let [[min-value :as sorted] (sort (map :rank hand))]
+    (= sorted (take 4 (iterate inc min-value)))))
+
+(defn straight-flush? [hand]
+  (and (straight? hand) (flush? hand)))
+
+(defn two-pair? [hand]
+  (or (= 2 (get (frequencies (vals (frequencies (map :rank hand)))) 2))
+    (= 1 (get (frequencies (vals (frequencies (map :rank hand)))) 4))))
+
 (defn -main [& args]
   (time (let [deck (create-deck)
          hands (create-hands deck)
-         hands (filter flush? hands)]
-     (println (count hands)))))
+         hands-flush (filter flush? hands)]
+          (println "# of possible Flushes")
+     (println (count hands-flush)))))
+
